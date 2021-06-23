@@ -1,6 +1,10 @@
 import weakref
+from logging import getLogger, NullHandler
 
 from .view import View
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class Widget:
@@ -30,16 +34,16 @@ class Widget:
         self.draw_ended()
 
     def draw_began(self):
-        print("<{widget}>".format(widget=str(self)))
+        logger.debug("<{widget}>".format(widget=str(self)))
 
     def draw_ended(self):
-        print("</{widget}>".format(widget=str(self)))
+        logger.debug("</{widget}>".format(widget=str(self)))
 
     def update(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
         for k, v in kwargs.items():
-            print("{} = {}".format(k, v))
+            logger.debug("{} = {}".format(k, v))
             setattr(self, k, v)
 
     def deinit(self):

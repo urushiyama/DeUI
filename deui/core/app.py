@@ -1,8 +1,13 @@
+import logging
 import threading
 import weakref
+from logging import getLogger, NullHandler
 
 from .helper.iter_utils import align_iterables
 from .root import Root
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class App:
@@ -32,24 +37,24 @@ class App:
         with self.root_widget() as new_tree:
             self.view_constructor()
         App.update_tree(self.root_view, new_tree, root=self.root_widget)
-        print("finish update tree")
-        print("###OLD TREE" + "#"*18)
+        logger.info("finished updating view tree")
+        logger.debug("###OLD TREE" + "#"*18)
         if self.root_view is not None:
             self.root_view.dump_tree()
         else:
-            print("(None)")
-        print("###NEW TREE" + "#"*18)
+            logger.debug("(None)")
+        logger.debug("###NEW TREE" + "#"*18)
         if new_tree is not None:
             new_tree.dump_tree()
         else:
-            print("(None)")
-        print("#"*30)
+            logger.debug("(None)")
+        logger.debug("#"*30)
         if self.root_view is not None:
             self.root_view.remove()
-        print("finish remove old tree")
+        logger.info("finish remove old tree")
         self.root_view = new_tree
         self.root_view.render()
-        print("finish render tree")
+        logger.info("finish render tree")
         self.is_rendering = False
         self.need_update = False
 
@@ -59,16 +64,16 @@ class App:
             return
         if (old_tree is None
                 or new_tree.widget_type is not old_tree.widget_type):
-            print("building new tree")
+            logger.debug("building new tree")
             if old_tree is not None:
-                print("changed widget type {} -> {}".format(old_tree.widget_type, new_tree.widget_type))
+                logger.debug("changed widget type {} -> {}".format(old_tree.widget_type, new_tree.widget_type))
             new_tree.build(root=root)
-            print("finish build tree")
+            logger.debug("finish build tree")
             return
         new_tree.widget = old_tree.widget
         new_tree.widget.owner_view = weakref.ref(new_tree)
         if new_tree.hashcode != old_tree.hashcode:
-            print("update widget parameters")
+            logger.debug("update widget parameters")
             new_tree.widget.update(*new_tree.args, **new_tree.kwargs)
             new_tree.need_update = True
         for old_subtree, new_subtree in align_iterables(old_tree.children, new_tree.children, key='id'):
@@ -91,7 +96,7 @@ class App:
         while not self.__stopped:
             if self.need_update:
                 self.pre_render()
-                print("render start from lifecycle")
+                logger.debug("render start from lifecycle")
                 self.render()
                 self.post_render()
         self.before_exit()

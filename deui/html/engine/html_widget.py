@@ -1,6 +1,11 @@
+from logging import getLogger, NullHandler
+
 from ...core.widget import Widget
 from ..attribute import AttributeRenderer
 from ..attribute.composite import Common
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class HTMLWidget(Widget):
@@ -36,16 +41,16 @@ class HTMLWidget(Widget):
         for k, v in kwargs.items():
             if isinstance(v, bool) and v:
                 # Boolean attributes
-                print(f"{k} = {k} ({v})")
+                logger.debug(f"{k} = {k} ({v})")
                 setattr(self, k, k)
             else:
-                print(f"{k} = {v}")
+                logger.debug(f"{k} = {v}")
                 setattr(self, k, v)
 
     def draw(self):
         if (self.owner_view() is not None
                 and not self.owner_view().has_updated_children):
-            print("skip update {}".format(str(self)))
+            logger.debug("skip update {}".format(str(self)))
             return
         self.representation = ""
         if self.owner_view() is not None:

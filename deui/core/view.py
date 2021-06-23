@@ -1,5 +1,9 @@
 import textwrap
 import weakref
+from logging import getLogger, NullHandler
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class View:
@@ -113,7 +117,7 @@ class View:
         pass
 
     def dump_tree(self, level=0):
-        print(textwrap.dedent("""
+        logger.debug(textwrap.dedent("""
             {level}- [{updated}|{c_updated}] {name}: {hashcode}
             {level}    ID: view={view}, widget={widget}, widget owner={owner}
             """).strip().format(

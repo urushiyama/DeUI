@@ -1,4 +1,9 @@
+from logging import getLogger, NullHandler
+
 from ..engine import HTMLWidget
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class Joined(HTMLWidget):
@@ -12,7 +17,7 @@ class Joined(HTMLWidget):
     def draw(self):
         if (self.owner_view() is not None
                 and not self.owner_view().has_updated_children):
-            print("skip update {}".format(str(self)))
+            logger.debug("skip update {}".format(str(self)))
             return
         if self.owner_view() is not None:
             for child_view in self.owner_view().children:
